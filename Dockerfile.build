@@ -1,0 +1,26 @@
+FROM ubuntu:22.04
+RUN apt-get update && \
+    apt-get install -y \
+        build-essential \
+        gcc-${HOST_TRIPLET} \
+        g++-${HOST_TRIPLET} \
+        binutils-${HOST_TRIPLET} \
+        autoconf \
+        automake \
+        libtool \
+        git \
+        make
+
+# Создаем директории
+RUN mkdir -p /artifacts /build && \
+    chmod 777 /artifacts /build
+
+# Создаем пользователя с ID 110 (соответствует ID пользователя Jenkins)
+RUN useradd -u 110 -m jenkins_builder && \
+    chown -R jenkins_builder:jenkins_builder /artifacts /build
+
+# Настройка git для всех пользователей
+RUN git config --system --add safe.directory '*'
+
+USER jenkins_builder
+WORKDIR /build
